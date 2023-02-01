@@ -1,0 +1,185 @@
+version: '3'
+networks:
+  pulsar:
+    driver: bridge
+  sidecar:
+    driver: bridge
+services:
+# Start zookeeper
+  zookeeper:
+    image: apachepulsar/pulsar:latest
+    profiles: ["pulsar"]
+    container_name: zookeeper
+    restart: on-failure
+    networks:
+      - pulsar
+    volumes:
+      - ./data/zookeeper:/pulsar/data/zookeeper
+    environment:
+      - metadataStoreUrl=zk:zookeeper:2181
+    command: >
+      bash -c "bin/apply-config-from-env.py conf/zookeeper.conf && \
+             bin/generate-zookeeper-config.sh conf/zookeeper.conf && \
+             exec bin/pulsar zookeeper"
+    healthcheck:
+      test: ["CMD", "bin/pulsar-zookeeper-ruok.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+# Init cluster metadata
+  pulsar-init:
+    container_name: pulsar-init
+    hostname: pulsar-init
+    image: apachepulsar/pulsar:latest
+    profiles: ["pulsar"]
+    networks:
+      - pulsar
+    command: >
+      bin/pulsar initialize-cluster-metadata \
+               --cluster cluster-a \
+               --zookeeper zookeeper:2181 \
+               --configuration-store zookeeper:2181 \
+               --web-service-url http://broker:8080 \
+               --broker-service-url pulsar://broker:6650
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+
+# Start bookie
+  bookie:
+    image: apachepulsar/pulsar:latest
+    profiles: ["pulsar"]
+    container_name: bookie
+    restart: on-failure
+    networks:
+      - pulsar
+    environment:
+      - clusterName=cluster-a
+      - zkServers=zookeeper:2181
+      - metadataServiceUri=metadata-store:zk:zookeeper:2181
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+      pulsar-init:
+        condition: service_completed_successfully
+  # Map the local directory to the container to avoid bookie startup failure due to insufficient container disks.
+    volumes:
+      - ./data/bookkeeper:/pulsar/data/bookkeeper
+    command: bash -c "bin/apply-config-from-env.py conf/bookkeeper.conf
+      && exec bin/pulsar bookie"
+
+# Start broker
+  broker:
+    image: apachepulsar/pulsar:latest
+    profiles: ["pulsar"]
+    container_name: broker
+    hostname: broker
+    restart: on-failure
+    networks:
+      - pulsar
+    environment:
+      - metadataStoreUrl=zk:zookeeper:2181
+      - zookeeperServers=zookeeper:2181
+      - clusterName=cluster-a
+      - managedLedgerDefaultEnsembleSize=1
+      - managedLedgerDefaultWriteQuorum=1
+      - managedLedgerDefaultAckQuorum=1
+      - advertisedAddress=broker
+      - advertisedListeners=external:pulsar://127.0.0.1:6650
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+      bookie:
+        condition: service_started
+    ports:
+      - "6650:6650"
+      - "8080:8080"
+    volumes:
+      - ./connectors/pulsar:/pulsar/connectors
+    command: bash -c "bin/apply-config-from-env.py conf/broker.conf
+      &&  exec bin/pulsar broker"
+  
+  # MySQL8
+  db:
+    image: mysql:8
+    hostname: mysqldb
+    container_name: mysqldb
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=reservas
+      - MYSQL_ROOT_PASSWORD=adminadmin
+    profiles: ["aeroalpes", "db"]
+    networks:
+      - pulsar
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  
+  # Servicios de AeroAlpes
+  aeroalpes:
+    container_name: aeroalpes
+    hostname: aeroalpes
+    image: aeroalpes/flask 
+    profiles: ["aeroalpes", "monolito"]
+    networks:
+      - sidecar
+      - pulsar
+    labels:
+      SidecarDiscover: "false"
+    depends_on:
+      - broker
+      - db
+    environment:
+      - AEROALPES_ADDRESS=aeroalpes
+      - PULSAR_ADDRESS=broker
+    ports:
+      - "5000:5000"
+  adaptador:
+    image: "aeroalpes/adaptador"
+    profiles: ["aeroalpes", "monolito"]
+    container_name: adaptador
+    hostname: adaptador
+    depends_on:
+      - aeroalpes
+    networks:
+      - sidecar
+    environment:
+      - AEROALPES_ADDRESS=aeroalpes
+      - PULSAR_ADDRESS=broker
+    ports:
+      - "50051:50051"
+  
+  # Servicios de Notificación
+  notificacion:
+    container_name: notificacion
+    hostname: notificacion
+    image: aeroalpes/notificacion 
+    profiles: ["aeroalpes", "notificacion"]
+    depends_on:
+      - aeroalpes
+      - broker
+    environment:
+      - AEROALPES_ADDRESS=aeroalpes
+      - PULSAR_ADDRESS=broker
+    networks:
+      - pulsar
+  # Servicio UI
+  ui:
+    container_name: ui
+    hostname: ui
+    image: aeroalpes/ui 
+    profiles: ["aeroalpes", "ui"]
+    depends_on:
+      - aeroalpes
+      - broker
+    environment:
+      - AEROALPES_ADDRESS=aeroalpes
+      - PULSAR_ADDRESS=broker
+    networks:
+      - pulsar
+    ports:
+      - "5678:5678"

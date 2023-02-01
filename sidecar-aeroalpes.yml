@@ -1,0 +1,29 @@
+# ------------------
+# Ejemplo base de Sidecar: Es probable que cuando lo desploiegue en Kubernetes deba modificar este archivo
+# ------------------
+metadata:
+  name: aeroalpes
+  labels:
+    app: backend
+spec:
+  containers:
+    - name: aeroalpes
+      image: # Imagen en Image Registry
+    - name: adaptador-grpc
+      image: # Imagen en Image Registry
+
+---
+
+# Service Configuration
+# --------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: aeralpes-backend
+spec:
+  ports:
+  - port: 50051
+    protocol: TCP
+  selector:
+    app: backend
+  type: NodePort
