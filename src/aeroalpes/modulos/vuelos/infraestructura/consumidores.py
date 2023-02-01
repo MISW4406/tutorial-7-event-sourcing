@@ -9,6 +9,7 @@ from aeroalpes.modulos.vuelos.infraestructura.schema.v1.eventos import EventoRes
 from aeroalpes.modulos.vuelos.infraestructura.schema.v1.comandos import ComandoCrearReserva
 from aeroalpes.modulos.vuelos.infraestructura.fabricas import FabricaRepositorio
 from aeroalpes.modulos.vuelos.infraestructura.repositorios import RepositorioReservas
+from aeroalpes.modulos.vuelos.dominio.entidades import Reserva
 
 from aeroalpes.seedwork.infraestructura import utils
 
@@ -26,8 +27,11 @@ def suscribirse_a_eventos():
             # TODO Piense como puede desacoplar esta funcionalidad. Tal vez despachando un evento y un handler de procesamiento?
             fabrica_repositorio = FabricaRepositorio()
             repositorio = fabrica_repositorio.crear_objeto(RepositorioReservas)
-            
-            repositorio.agregar()
+
+            # TODO El evento de creación no viene con todos los datos de itinerarios, esto tal vez pueda ser una extensión
+            # Asi mismo estamos dejando la funcionalidad de persistencia en el mismo método de recepción. Piense que componente
+            # podriamos diseñar para alojar esta funcionalidad
+            repositorio.agregar(Reserva(_id=str(id_reserva), id_cliente=str(id_cliente), estado=str(estado)))
 
             consumidor.acknowledge(mensaje)     
 
