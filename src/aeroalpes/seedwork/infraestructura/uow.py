@@ -28,14 +28,25 @@ class UnidadTrabajo(ABC):
     def __exit__(self, *args):
         self.rollback()
 
-    def _obtener_eventos(self, batches=None):
+    def _obtener_eventos_rollback(self, batches=None):
         batches = self.batches if batches is None else batches
+        eventos = list()
         for batch in batches:
             for arg in batch.args:
                 if isinstance(arg, AgregacionRaiz):
-                    print(arg.eventos)
-                    return arg.eventos
-        return list()
+                    eventos += arg.eventos_compensacion
+                    break
+        return eventos
+
+    def _obtener_eventos(self, batches=None):
+        batches = self.batches if batches is None else batches
+        eventos = list()
+        for batch in batches:
+            for arg in batch.args:
+                if isinstance(arg, AgregacionRaiz):
+                    eventos += arg.eventos
+                    break
+        return eventos
 
     @abstractmethod
     def _limpiar_batches(self):
@@ -97,13 +108,16 @@ def registrar_unidad_de_trabajo(serialized_obj):
 
 def flask_uow():
     from flask import session
-    from aeroalpes.config.uow import UnidadTrabajoSQLAlchemy
+    from aeroalpes.config.uow import UnidadTrabajoSQLAlchemy, UnidadTrabajoPulsar
     if session.get('uow'):
         return session['uow']
-    else:
-        uow_serialized = pickle.dumps(UnidadTrabajoSQLAlchemy())
-        registrar_unidad_de_trabajo(uow_serialized)
-        return uow_serialized
+
+    uow_serialized = pickle.dumps(UnidadTrabajoSQLAlchemy())
+    if session.get('uow_metodo') == 'pulsar':
+        uow_serialized = pickle.dumps(UnidadTrabajoPulsar())
+    
+    registrar_unidad_de_trabajo(uow_serialized)
+    return uow_serialized
 
 def unidad_de_trabajo() -> UnidadTrabajo:
     if is_flask():

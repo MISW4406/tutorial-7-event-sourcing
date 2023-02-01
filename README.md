@@ -1,4 +1,4 @@
-# Tutorial 6 - Change Data Capture (CDC) & Outbox
+# Tutorial 7 - Event Sourcing
 
 Repositorio con código base para la liberación de datos por medio de eventos con carga de estados usando un mecanismo de logs. El presente repositorio usa un conector de [Debezium](https://debezium.io/) para poder oir los cambios en el log binario de una base de datos MySQL. Así mismo, se puede ver un ejemplo del patrón Outbox, donde persistimos eventos para poder ser distribuidos en nuestro EventBroker.
 

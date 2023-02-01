@@ -45,18 +45,22 @@ class Reserva(AgregacionRaiz):
         self.itinerarios = reserva.itinerarios
 
         self.agregar_evento(ReservaCreada(id_reserva=self.id, id_cliente=self.id_cliente, estado=self.estado.name, fecha_creacion=self.fecha_creacion))
+        # TODO Agregar evento de compensación
 
     def aprobar_reserva(self):
         self.estado = ov.EstadoReserva.APROBADA
 
         self.agregar_evento(ReservaAprobada(self.id, self.fecha_actualizacion))
+        # TODO Agregar evento de compensación
 
     def cancelar_reserva(self):
         self.estado = ov.EstadoReserva.CANCELADA
 
         self.agregar_evento(ReservaCancelada(self.id, self.fecha_actualizacion))
+        # TODO Agregar evento de compensación
     
     def pagar_reserva(self):
         self.estado = ov.EstadoReserva.PAGADA
 
         self.agregar_evento(ReservaPagada(self.id, self.fecha_actualizacion))
+        # TODO Agregar evento de compensación

@@ -7,6 +7,9 @@ import traceback
 
 from aeroalpes.modulos.vuelos.infraestructura.schema.v1.eventos import EventoReservaCreada
 from aeroalpes.modulos.vuelos.infraestructura.schema.v1.comandos import ComandoCrearReserva
+from aeroalpes.modulos.vuelos.infraestructura.fabricas import FabricaRepositorio
+from aeroalpes.modulos.vuelos.infraestructura.repositorios import RepositorioReservas
+
 from aeroalpes.seedwork.infraestructura import utils
 
 def suscribirse_a_eventos():
@@ -17,7 +20,14 @@ def suscribirse_a_eventos():
 
         while True:
             mensaje = consumidor.receive()
-            print(f'Evento recibido: {mensaje.value().data}')
+            datos = mensaje.value().data
+            print(f'Evento recibido: {datos}')
+
+            # TODO Piense como puede desacoplar esta funcionalidad. Tal vez despachando un evento y un handler de procesamiento?
+            fabrica_repositorio = FabricaRepositorio()
+            repositorio = fabrica_repositorio.crear_objeto(RepositorioReservas)
+            
+            repositorio.agregar()
 
             consumidor.acknowledge(mensaje)     
 

@@ -37,12 +37,17 @@ class Entidad:
 @dataclass
 class AgregacionRaiz(Entidad, ValidarReglasMixin):
     eventos: list[EventoDominio] = field(default_factory=list)
+    eventos_compensacion: list[EventoDominio] = field(default_factory=list)
 
-    def agregar_evento(self, evento: EventoDominio):
+    def agregar_evento(self, evento: EventoDominio, evento_compensacion: EventoDominio = None):
         self.eventos.append(evento)
+
+        if evento_compensacion:
+            self.eventos_compensacion.append(evento_compensacion)
     
     def limpiar_eventos(self):
         self.eventos = list()
+        self.eventos_compensacion = list()
 
 
 @dataclass

@@ -16,6 +16,10 @@ bp = api.crear_blueprint('vuelos', '/vuelos')
 @bp.route('/reserva', methods=('POST',))
 def reservar_usando_comando():
     try:
+        # NOTE Asignamos el valor 'pulsar' para usar la Unidad de trabajo de Pulsar y 
+        # no la defecto de SQLAlchemy
+        session['uow_metodo'] = 'pulsar'
+
         reserva_dict = request.json
 
         map_reserva = MapeadorReservaDTOJson()
