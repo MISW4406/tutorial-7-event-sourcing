@@ -15,5 +15,6 @@ class VistaReserva(Vista):
         
         if id_cliente:
             params['id_cliente'] = str(id_cliente)
-
+            
+        # TODO Convierta ReservaDTO a Reserva y valide que la consulta es correcta
         return db.session.query(ReservaDTO).filter_by(**params)
