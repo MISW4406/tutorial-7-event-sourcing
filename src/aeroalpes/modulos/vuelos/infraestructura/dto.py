@@ -62,5 +62,5 @@ class EventosReserva(db.Model):
 
 class ReservaAnalitica(db.Model):
     __tablename__ = "analitica_reservas"
-    fecha_creacion = db.Column(db.DateTime, primary_key=True)
+    fecha_creacion = db.Column(db.Date, primary_key=True)
     total = db.Column(db.Integer, primary_key=True, nullable=False)

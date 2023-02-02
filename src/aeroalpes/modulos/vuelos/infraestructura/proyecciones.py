@@ -31,7 +31,7 @@ class ProyeccionReservasTotales(ProyeccionReserva):
             logging.error('ERROR: DB del app no puede ser nula')
             return
         # NOTE esta no usa repositorios y de una vez aplica los cambios. Es decir, no todo siempre debe ser un repositorio
-        record = db.session.query(ReservaAnalitica).filter_by(fecha_creacion=self.fecha_creacion).one_or_none()
+        record = db.session.query(ReservaAnalitica).filter_by(fecha_creacion=self.fecha_creacion.date()).one_or_none()
 
         if record and self.operacion == self.ADD:
             record.total += 1
@@ -39,7 +39,7 @@ class ProyeccionReservasTotales(ProyeccionReserva):
             record.total -= 1 
             record.total = max(record.total, 0)
         else:
-            db.session.add(ReservaAnalitica(fecha_creacion=self.fecha_creacion, total=1))
+            db.session.add(ReservaAnalitica(fecha_creacion=self.fecha_creacion.date(), total=1))
         
         db.session.commit()
 

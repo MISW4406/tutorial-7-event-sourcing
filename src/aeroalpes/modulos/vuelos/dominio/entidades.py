@@ -6,6 +6,7 @@ En este archivo usted encontrará las entidades del dominio de vuelos
 
 from __future__ import annotations
 from dataclasses import dataclass, field
+import datetime
 
 import aeroalpes.modulos.vuelos.dominio.objetos_valor as ov
 from aeroalpes.modulos.vuelos.dominio.eventos import ReservaCreada, ReservaAprobada, ReservaCancelada, ReservaPagada
@@ -43,24 +44,28 @@ class Reserva(AgregacionRaiz):
         self.id_cliente = reserva.id_cliente
         self.estado = reserva.estado
         self.itinerarios = reserva.itinerarios
+        self.fecha_creacion = datetime.datetime.now()
 
         self.agregar_evento(ReservaCreada(id_reserva=self.id, id_cliente=self.id_cliente, estado=self.estado.name, fecha_creacion=self.fecha_creacion))
         # TODO Agregar evento de compensación
 
     def aprobar_reserva(self):
         self.estado = ov.EstadoReserva.APROBADA
+        self.fecha_actualizacion = datetime.datetime.now()
 
         self.agregar_evento(ReservaAprobada(self.id, self.fecha_actualizacion))
         # TODO Agregar evento de compensación
 
     def cancelar_reserva(self):
         self.estado = ov.EstadoReserva.CANCELADA
+        self.fecha_actualizacion = datetime.datetime.now()
 
         self.agregar_evento(ReservaCancelada(self.id, self.fecha_actualizacion))
         # TODO Agregar evento de compensación
     
     def pagar_reserva(self):
         self.estado = ov.EstadoReserva.PAGADA
+        self.fecha_actualizacion = datetime.datetime.now()
 
         self.agregar_evento(ReservaPagada(self.id, self.fecha_actualizacion))
         # TODO Agregar evento de compensación
