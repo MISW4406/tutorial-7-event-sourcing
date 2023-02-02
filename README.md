@@ -222,6 +222,26 @@ Ya dentro de la contenedora ejecute:
 ./bin/pulsar-admin topics list public/default
 ```
 
+### Cambiar retención de tópicos
+Abrir en una terminal:
+
+```bash
+docker exec -it broker bash
+```
+Ya dentro de la contenedora ejecute:
+
+```bash
+./bin/pulsar-admin namespaces set-retention public/default --size -1 --time -1
+```
+
+Para poder ver que los cambios fueron efectivos ejecute el siguiente comando:
+
+```bash
+./bin/pulsar-admin namespaces get-retention public/default
+```
+
+**Nota**: Esto nos dejará con una retención infinita. Sin embargo, usted puede cambiar la propiedad de `size` para poder usar [Tiered Storage](https://pulsar.apache.org/docs/2.11.x/concepts-tiered-storage/)
+
 ### Instrucciones oficiales
 
 Para seguir la guía oficial de instalación y uso de Debezium en Apache Pulsar puede usar el siguiente [link](https://pulsar.apache.org/docs/2.10.x/io-cdc-debezium/)

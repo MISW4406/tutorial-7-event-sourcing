@@ -65,6 +65,7 @@ class RepositorioReservasSQLAlchemy(RepositorioReservas):
 
     def agregar(self, reserva: Reserva):
         reserva_dto = self.fabrica_vuelos.crear_objeto(reserva, MapeadorReserva())
+
         db.session.add(reserva_dto)
 
     def actualizar(self, reserva: Reserva):
