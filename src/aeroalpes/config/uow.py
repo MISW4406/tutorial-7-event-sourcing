@@ -85,7 +85,6 @@ class UnidadTrabajoPulsar(UnidadTrabajo):
             logging.error('ERROR: Suscribiendose al tópico de eventos!')
             traceback.print_exc()
             self.rollback(index=index)
-            raise ExcepcionUoW()
         self._limpiar_batches()
 
     def rollback(self, index=None):

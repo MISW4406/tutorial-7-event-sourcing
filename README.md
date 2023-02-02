@@ -1,25 +1,17 @@
 # Tutorial 7 - Event Sourcing
 
-Repositorio con código base para la liberación de datos por medio de eventos con carga de estados usando un mecanismo de logs. El presente repositorio usa un conector de [Debezium](https://debezium.io/) para poder oir los cambios en el log binario de una base de datos MySQL. Así mismo, se puede ver un ejemplo del patrón Outbox, donde persistimos eventos para poder ser distribuidos en nuestro EventBroker.
+Repositorio con código base con la implementación de un servicio usando el patrón Event Sourcing.
 
-Este repositorio está basado en el repositorio de sidecars visto en el tutorial 5 del curso. Por tal motivo, puede usar ese mismo repositorio para entender algunos detalles que este README no cubre.
+Este repositorio está basado en el repositorio de liberación de datos visto en el tutorial 6 del curso. Por tal motivo, puede usar ese mismo repositorio para entender algunos detalles que este README no cubre.
 
 ## Estructura del proyecto
 
 Este repositorio sigue en general la misma estructura del repositorio de origen. Sin embargo, hay un par de adiciones importante mencionar:
 
-- El directorio **connectors** provee los conectores CDC de Debezium y su configuración en YAML. Si desea descargar una versión diferente del conector puede usar el siguiente comando:
-
-    ```bash
-    wget https://archive.apache.org/dist/pulsar/pulsar-2.10.1/connectors/pulsar-io-debezium-mysql-2.10.1.nar
-    ```
-    **Nota**: Puede encontrar las diferentes versiones en esta [página](https://pulsar.apache.org/download/).
-- El directorio **data** ahora también cuenta con un nuevo directorio llamado **mysql**, el cual aloja los datos de la base de datos.
-- El archivo **init.sql** en la raíz del proyecto se usa como punto de entrada de la base datos MySQL para configurar esquemas y tablas.
-- El archivo **repositorios** en el módulo de vuelos de la capa de infraestructura ahora cuenta con un repositorio para persistir eventos en una tabla de Outbox.
-- El archivo **mapeadores** en el módulo de vuelos de la capa de infraestructura ahora cuenta con un mapeador para tranformar de eventos de dominio a eventos de integración.
-
-**Nota**: Se eliminó el código redundante de servicios de aplicación y endpoints que enrutaban a él.
+- El archivo **src/aeroalpes/config/uow.py** ahora incluye una unidad de trabajo para Pulsar, esta nos va ayudar a mantener la consistencia transaccional en el servicio usando Apache Pulsar como nuestro Event Store.
+- El archivo **src/aeroalpes/modulos/vuelos/infraestructura/proyecciones.py** cuenta con las diferentes formas en que podemos hacer proyección de nuestros datos. Una de las proyecciones tiene propósitos analíticos y la otra transaccionales.
+- El archivo **src/aeroalpes/modulos/vuelos/infraestructura/vistas.py** cuenta con el modelo de vistas que podemos exponer a nuestro clientes. Como se puede observar, este es un modelo bastante genérico definido en el seedwork (pero usted puede hacerlo mucho más complejo).
+- Los archivos **src/aeroalpes/seedwork/infraestructura/proyecciones.py** y **src/aeroalpes/seedwork/infraestructura/vistas.py** proveen las interfaces y definiciones genéricas para las proyecciones, handlers y vistas.
 
 ## AeroAlpes
 ### Ejecutar Base de datos
