@@ -59,3 +59,8 @@ class EventosReserva(db.Model):
     formato_contenido = db.Column(db.String(10), nullable=False)
     nombre_servicio = db.Column(db.String(40), nullable=False)
     contenido = db.Column(db.Text, nullable=False)
+
+class ReservaAnalitica(db.Model):
+    __tablename__ = "analitica_reservas"
+    fecha_creacion = db.Column(db.DateTime, primary_key=True)
+    total = db.Column(db.Integer, primary_key=True, nullable=False)
