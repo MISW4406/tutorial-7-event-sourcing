@@ -23,8 +23,6 @@ tasks:
       mkdir -p data/bookkeeper && 
       mkdir -p data/zookeeper && 
       mkdir -p data/mysql && 
-      mkdir -p data/mysql/#innodb_redo &&
-      mkdir -p data/mysql/#innodb_temp &&
       sudo chmod -R 777 ./data &&
       sudo chmod -R 777 ./connectors
   - name: Pull el Docker compose
