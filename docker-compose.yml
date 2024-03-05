@@ -109,9 +109,9 @@ services:
       - SYS_NICE
     restart: always
     environment:
-      - MYSQL_DATABASE=reservas
+      - MYSQL_DATABASE=propiedades
       - MYSQL_ROOT_PASSWORD=adminadmin
-    profiles: ["aeroalpes", "db"]
+    profiles: ["propertiesalpes", "db"]
     networks:
       - pulsar
     ports:
@@ -119,12 +119,12 @@ services:
     volumes:
       - ./data/mysql:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql  
-  # Servicios de AeroAlpes
-  aeroalpes:
-    container_name: aeroalpes
-    hostname: aeroalpes
-    image: aeroalpes/flask 
-    profiles: ["aeroalpes", "monolito"]
+  # Servicios de PropertiesAlpes
+  propertiesalpes:
+    container_name: propertiesalpes
+    hostname: propertiesalpes
+    image: propertiesalpes/flask 
+    profiles: ["propertiesalpes", "monolito"]
     networks:
       - sidecar
       - pulsar
@@ -134,21 +134,21 @@ services:
       - broker
       - db
     environment:
-      - AEROALPES_ADDRESS=aeroalpes
+      - PROPERTIESALPES_ADDRESS=propertiesalpes
       - PULSAR_ADDRESS=broker
     ports:
       - "5000:5000"
   adaptador:
-    image: "aeroalpes/adaptador"
-    profiles: ["aeroalpes", "monolito"]
+    image: "propertiesalpes/adaptador"
+    profiles: ["propertiesalpes", "monolito"]
     container_name: adaptador
     hostname: adaptador
     depends_on:
-      - aeroalpes
+      - propertiesalpes
     networks:
       - sidecar
     environment:
-      - AEROALPES_ADDRESS=aeroalpes
+      - PROPERTIESALPES_ADDRESS=propertiesalpes
       - PULSAR_ADDRESS=broker
     ports:
       - "50051:50051"
@@ -157,13 +157,13 @@ services:
   notificacion:
     container_name: notificacion
     hostname: notificacion
-    image: aeroalpes/notificacion 
-    profiles: ["aeroalpes", "notificacion"]
+    image: propertiesalpes/notificacion 
+    profiles: ["propertiesalpes", "notificacion"]
     depends_on:
-      - aeroalpes
+      - propertiesalpes
       - broker
     environment:
-      - AEROALPES_ADDRESS=aeroalpes
+      - PROPERTIESALPES_ADDRESS=propertiesalpes
       - PULSAR_ADDRESS=broker
     networks:
       - pulsar
@@ -171,13 +171,13 @@ services:
   ui:
     container_name: ui
     hostname: ui
-    image: aeroalpes/ui 
-    profiles: ["aeroalpes", "ui"]
+    image: propertiesalpes/ui 
+    profiles: ["propertiesalpes", "ui"]
     depends_on:
-      - aeroalpes
+      - propertiesalpes
       - broker
     environment:
-      - AEROALPES_ADDRESS=aeroalpes
+      - PROPERTIESALPES_ADDRESS=propertiesalpes
       - PULSAR_ADDRESS=broker
     networks:
       - pulsar
