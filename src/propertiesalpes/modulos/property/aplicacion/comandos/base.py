@@ -1,0 +1,1 @@
+from propertiesalpes.seedwork.aplicacion.comandos import ComandoHandler
