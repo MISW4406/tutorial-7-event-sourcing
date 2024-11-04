@@ -34,7 +34,6 @@ class UnidadTrabajoSQLAlchemy(UnidadTrabajo):
 
     def commit(self):
         for batch in self.batches:
-            lock = batch.lock
             batch.operacion(*batch.args, **batch.kwargs)
                 
         db.session.commit()  # Commits the transaction
