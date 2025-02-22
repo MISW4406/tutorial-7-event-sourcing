@@ -20,7 +20,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Instalacion de dependencias
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade "pip<24.1"
           pip install flake8 pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Correr Pruebas
