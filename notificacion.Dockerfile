@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.12
 
 COPY notificacion-requirements.txt ./
 RUN pip install --no-cache-dir -r notificacion-requirements.txt

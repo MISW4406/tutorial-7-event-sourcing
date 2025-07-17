@@ -134,3 +134,5 @@ dmypy.json
 # Data Volume for Zookeeper
 /data
 /bin
+src/sidecar/pb2py/
+src/sidecar/aeroalpes/pb2py/
