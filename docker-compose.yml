@@ -96,7 +96,7 @@ services:
   
   # MySQL8
   db:
-    image: mysql:8
+    image: mysql:8.0.28
     hostname: mysqldb
     container_name: mysqldb
     cap_add:

@@ -1,0 +1,17 @@
+{
+  "name": "tutorial-7-event-sourcing",
+  "image": "mcr.microsoft.com/vscode/devcontainers/python:3.12",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2.12.2": {
+      "version": "28.3.2"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.12.11"
+    }
+  },
+  "initializeCommand": "bash .devcontainer/init.sh",
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "runArgs": ["--init", "--privileged"],
+  "forwardPorts": [3306, 5000, 50051, 5678, 2181, 8080, 6650],
+  "remoteUser": "vscode"
+}

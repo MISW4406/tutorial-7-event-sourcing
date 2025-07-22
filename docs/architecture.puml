@@ -1,0 +1,55 @@
+@startuml
+' Vista de paquetes basada en arquitectura hexagonal
+
+package "src" {
+    package "aeroalpes" {
+        package "api" as api
+        note right of api
+            Endpoints HTTP expuestos via Flask.
+        end note
+
+        package "config" as config
+        note right of config
+            Configuraciones y acceso a la base de datos.
+        end note
+
+        package "ejemplos" as ejemplos
+        note right of ejemplos
+            Codigo de muestra y pruebas de concepto.
+        end note
+
+        package "modulos" as modulos {
+            package "cliente"
+            package "hoteles"
+            package "pagos"
+            package "precios_dinamicos"
+            package "vehiculos"
+            package "vuelos" as vuelos
+        }
+        note right of modulos
+            Dominios de negocio implementados
+            siguiendo el estilo hexagonal (aplicacion,
+            dominio e infraestructura).
+        end note
+
+        package "seedwork" as seedwork
+        note right of seedwork
+            Abstracciones y utilidades comunes
+            que soportan la arquitectura.
+        end note
+    }
+
+    package "sidecar" as sidecar_pkg {
+        package "aeroalpes" {
+            package "pb2py"
+            package "protos"
+            package "servicios"
+        }
+        package "mensajes"
+    }
+    note right of sidecar_pkg
+        Adaptador gRPC que comunica
+        clientes externos con AeroAlpes.
+    end note
+}
+@enduml

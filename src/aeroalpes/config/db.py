@@ -25,5 +25,8 @@ def database_connection(config, basedir=os.path.abspath(os.path.dirname(__file__
 
 
 def init_db(app: Flask):
-    global db 
-    db = SQLAlchemy(app)
+    global db
+    if db is None:
+        db = SQLAlchemy()
+    if 'sqlalchemy' not in app.extensions:
+        db.init_app(app)
