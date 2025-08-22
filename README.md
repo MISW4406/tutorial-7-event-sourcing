@@ -1,5 +1,7 @@
 # Tutorial 7 - Event Sourcing
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&repo=MISW4406/tutorial-7-event-sourcing) 
+
 Repositorio con código base con la implementación de un servicio usando el patrón Event Sourcing.
 
 Este repositorio está basado en el repositorio de liberación de datos visto en el tutorial 6 del curso. Por tal motivo, puede usar ese mismo repositorio para entender algunos detalles que este README no cubre.
